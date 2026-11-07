@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from visualization import plot_individual_psths, plot_population_mean_psth, plot_neuron_maxima
+from visualization import plot_individual_psths, plot_population_mean_psth, plot_neuron_maxima, plot_pc_trajectories
 
 # Load data
 data = np.load("data/psths.npz")
@@ -34,7 +34,7 @@ fig = plot_neuron_maxima(neuron_maxima)
 fig.savefig("outputs/e2_neuron_maxima.pdf", bbox_inches="tight")
 # plt.show()
 
-# Normalize maximas
+# Normalize each neurons activities
 neuron_maxima_broadcasted = X.max(axis=(1, 2), keepdims=True)
 neuron_minima_broadcasted = X.min(axis=(1, 2), keepdims=True)
 X_normalized = (X - neuron_minima_broadcasted) / (neuron_maxima_broadcasted - neuron_minima_broadcasted + 5)
@@ -63,3 +63,15 @@ Z = V_M.T @ X_matrix
 
 retained_variance = eigenvalues[:12].sum() / eigenvalues.sum()
 print(retained_variance)
+
+############
+# Exercise 3
+############
+
+Z_trajectories = Z.reshape(12, 108, 46)
+pc1 = Z_trajectories[0, 0, :]
+pc2 = Z_trajectories[1, 0, :]
+
+fig = plot_pc_trajectories(Z_trajectories)
+fig.savefig("outputs/e3_pc_trajectories.pdf", bbox_inches="tight")
+plt.show()
