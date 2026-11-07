@@ -1,0 +1,15 @@
+.venv/
+
+__pycache__/
+*.pyc[cod]
+
+.env
+
+#LaTeX aux files
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
