@@ -29,3 +29,12 @@ def plot_population_mean_psth(X, times):
 
     return fig
 
+def plot_neuron_maxima(neuron_maxima):
+    fig, ax = plt.subplots()
+    ax.hist(neuron_maxima, bins=20)
+    ax.set_title("Distribution of Neuron Maxima")
+    ax.set_xlabel("Max Firing Rate (Hz)")
+    ax.set_ylabel("Number of Neurons")
+    fig.tight_layout()
+
+    return fig
