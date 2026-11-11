@@ -41,7 +41,12 @@ def plot_neuron_maxima(neuron_maxima):
 
     return fig
 
-def plot_pc_trajectories(Z_trajectories):
+def plot_pc_trajectories(
+    Z_trajectories,
+    title="Principal Component Trajectories",
+    xlabel="PC1 Score",
+    ylabel="PC2 Score"
+):
     start_x = Z_trajectories[0, :, 0]
     start_y = Z_trajectories[1, :, 0]
     colors = cond_color.get_colors(start_x, start_y)
@@ -57,9 +62,9 @@ def plot_pc_trajectories(Z_trajectories):
     cond_color.plot_start(start_x, start_y, colors, markersize=80, ax=ax)
     cond_color.plot_end(end_x, end_y, colors, markersize=25, ax=ax)
 
-    ax.set_title("Principal Component Trajectories")
-    ax.set_xlabel("PC1 Score")
-    ax.set_ylabel("PC2 Score")
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
     ax.set_aspect("equal", adjustable="box")
     fig.tight_layout()
 
