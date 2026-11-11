@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from visualization import plot_individual_psths, plot_population_mean_psth, plot_neuron_maxima, plot_pc_trajectories
+from visualization import plot_individual_psths, plot_population_mean_psth, plot_neuron_maxima, plot_pc_trajectories, plot_dynamics_matrix
 from dynamics import construct_H
 
 # Load data
@@ -204,3 +204,13 @@ A_beta_trial = np.tensordot(beta_trial, H, axes=1)
 residuals_beta = delta_Z_matrix - A_beta_trial @ Z_current_matrix
 G_beta = residuals_beta @ Z_current_matrix.T
 
+###
+# d
+###
+
+beta_hat = np.linalg.solve(Q.T, b)
+A_hat = np.tensordot(beta_hat, H, axes=1)
+
+fig = plot_dynamics_matrix(A_hat)
+fig.savefig("outputs/e4_dynamics_matrix.pdf", bbox_inches="tight")
+plt.show()

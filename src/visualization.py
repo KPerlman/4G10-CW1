@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import cond_color
+import numpy as np
 
 def plot_individual_psths(X, times, neurons, conditions):
     fig, axes = plt.subplots(2, 2, figsize=(10, 7), sharex=True)
@@ -59,6 +60,18 @@ def plot_pc_trajectories(Z_trajectories):
     ax.set_title("Principal Component Trajectories")
     ax.set_xlabel("PC1 Score")
     ax.set_ylabel("PC2 Score")
+    fig.tight_layout()
+
+    return fig
+
+def plot_dynamics_matrix(A):
+    fig, ax = plt.subplots()
+    limit = np.max(np.abs(A))
+    image = ax.imshow(A, cmap="RdBu_r", vmin=-limit, vmax=limit)
+    fig.colorbar(image, ax=ax, label="Predicted change per unit current PC coordinate")
+    ax.set_title("Fitted Dynamics Matrix A")
+    ax.set_xlabel("Current PC Coordinate")
+    ax.set_ylabel("Predicted change in PC Coordinate")
     fig.tight_layout()
 
     return fig
