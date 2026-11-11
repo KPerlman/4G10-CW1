@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from visualization import plot_individual_psths, plot_population_mean_psth, plot_neuron_maxima, plot_pc_trajectories, plot_dynamics_matrix
+from visualization import plot_individual_psths, plot_population_mean_psth, plot_neuron_maxima, plot_pc_trajectories, plot_dynamics_matrix, plot_premovement_comparison
 from dynamics import estimate_A, construct_H
 
 # Load data
@@ -184,4 +184,26 @@ for rank, index in enumerate(plane_idxs[1:3], start=2):
         bbox_inches="tight"
     )
 
+############
+# Exercise 6
+############
+
+# Isolate premovement data
+premovement_mask = (times >= -800) & (times <= -150)
+X_premovement = X_centered[:, :, premovement_mask]
+premovement_times = times[premovement_mask]
+
+# Make projection
+P_neural = P_FR @ V_M.T
+# Arrange as columns
+X_premovement_matrix = X_premovement.reshape(182, -1)
+premovement_coords = P_neural @ X_premovement_matrix
+
+premovement_trajectories = premovement_coords.reshape(2, 108, 66)
+
+fig = plot_premovement_comparison(
+    FR_plot_trajectories,
+    premovement_trajectories
+)
+fig.savefig("outputs/e6_premovement_comparison.pdf", bbox_inches="tight")
 plt.show()

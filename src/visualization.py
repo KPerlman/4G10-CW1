@@ -81,3 +81,42 @@ def plot_dynamics_matrix(A):
     fig.tight_layout()
 
     return fig
+
+def plot_premovement_comparison(
+    movement_trajectories,
+    premovement_trajectories
+):
+    fig = plot_pc_trajectories(
+        movement_trajectories,
+        title="Pre-movement and movement activity",
+        xlabel="FR axis 1",
+        ylabel="FR axis 2"
+    )
+    ax = fig.axes[0]
+
+    # Fade movement markers because it was cluttered
+    for collection in ax.collections:
+        collection.set_alpha(0.25)
+
+    # Reduce opacity of movement so premovement is more visible
+    for line in ax.lines:
+        line.set_alpha(0.25)
+
+    end_x = premovement_trajectories[0, :, -1]
+    end_y = premovement_trajectories[1, :, -1]
+
+    colors = cond_color.get_colors(end_x, end_y, alt_colors=True)
+
+    # for each condition
+    # Select coordinates 0 and 1 from premovement_trajectories. plot them on ax, using colors[condition].
+    for condition in range(premovement_trajectories.shape[1]):
+        pc1 = premovement_trajectories[0, condition, :]
+        pc2 = premovement_trajectories[1, condition, :]
+        ax.plot(pc1, pc2, color=colors[condition])
+
+    start_x = premovement_trajectories[0, :, 0]
+    start_y = premovement_trajectories[1, :, 0]
+    cond_color.plot_start(start_x, start_y, colors, markersize=80, ax=ax)
+    cond_color.plot_end(end_x, end_y, colors, markersize=25, ax=ax)
+    fig.tight_layout()
+    return fig
