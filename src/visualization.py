@@ -53,7 +53,6 @@ def plot_pc_trajectories(Z_trajectories):
 
     end_x = Z_trajectories[0, :, -1]
     end_y = Z_trajectories[1, :, -1]
-
     cond_color.plot_start(start_x, start_y, colors, markersize=80, ax=ax)
     cond_color.plot_end(end_x, end_y, colors, markersize=25, ax=ax)
 
