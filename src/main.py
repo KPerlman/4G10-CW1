@@ -166,3 +166,41 @@ beta_small = np.array([1, 2, 3])
 A_small = np.tensordot(beta_small, H_small, axes=1)
 print(A_small)
 
+###
+# c
+###
+
+# Already have unconstrained gradient G = ▽l(A) = (D - AZ)Z^T, so can use chain rule to get gradient wrt beta
+# Each Gij says how much log-likelihood changes if change Aij slightly,so just need to sum over all Gij that depend on each independent parameter in beta
+# del(l)/del(beta_0) = G01 - G10 as each beta controls a pair of entries in A
+# del(l)/del(beta_a) = Gij - Gji
+# W_a = H_aZ_current from coursework
+# Each W_a holds one param's worth of contribution to predicted change AZ, so can use W_a to get gradient wrt beta
+# (AZ_current)_ij = sum_a(beta_a * W_ain)
+# For one transition n, predicted change in coord i is m_in = sum_b(beta_b * W_bin) where b runs through all params
+# If adjust only one param beta_a, effect is del(m_in)/del(beta_a) = W_ain
+# Because residual r_in = d_in - m_in, del(r_in)/del(beta_a) = -W_ain
+# So final result, differentiating log-likelihood contribution wrt beta_a gives del(l)/del(beta_a) = sum_in(r_in * W_ain)
+# But have to get in form of paper
+# I just did this by hand so we'll just outline that in the report
+# Form given is ▽beta(l) = b - betaQ
+# b_a = sum_in(d_in * W_ain) and Q_qa = sum_in(W_qin * W_ain)
+
+H = construct_H(12)
+
+W = np.tensordot(H, Z_current_matrix, axes=([2], [0])) # Gives H_a * Z_current for each a, so W is 66 x 12 x 4860
+
+# Reshape W to get b and Q
+W_matrix = W.reshape(66, -1)
+delta_flat = delta_Z_matrix.reshape(-1)
+b = delta_flat @ W_matrix.T
+Q = W_matrix @ W_matrix.T
+
+beta_trial = np.linspace(-0.01, 0.01, 66) # Creates a vector of 66 values from -0.01 to 0.01, inclusive, evenly spaced (just test params)
+beta_gradient = b - beta_trial @ Q
+
+A_beta_trial = np.tensordot(beta_trial, H, axes=1)
+
+residuals_beta = delta_Z_matrix - A_beta_trial @ Z_current_matrix
+G_beta = residuals_beta @ Z_current_matrix.T
+
