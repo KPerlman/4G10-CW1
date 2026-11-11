@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from visualization import plot_individual_psths, plot_population_mean_psth, plot_neuron_maxima, plot_pc_trajectories
+from dynamics import construct_H
 
 # Load data
 data = np.load("data/psths.npz")
@@ -156,4 +157,12 @@ print("Analytical:", gradient[0, 1])
 # A must be antisymmetric, so number of independent parameters is 12*11/2 = 66, so construction of A is just upper triangular part of A and then copy to lower triangular part with a negative sign
 # Will call vector of parameters beta, vector of length 66 containing independent parameters of A
 # Using template matricies to create A from beta, ie A = aH1 + bH2 + cH3 + ... where H1, H2, H3 are template matrices with 1 in appropriate upper triangular position and -1 in corresponding lower triangular position and 0 elsewhere
+
+H_small = construct_H(3) # 3 template matrices of size 3 x 3
+# print(H_small.shape)
+# print(H_small)
+
+beta_small = np.array([1, 2, 3])
+A_small = np.tensordot(beta_small, H_small, axes=1)
+print(A_small)
 
