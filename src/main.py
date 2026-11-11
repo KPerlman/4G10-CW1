@@ -206,4 +206,84 @@ fig = plot_premovement_comparison(
     premovement_trajectories
 )
 fig.savefig("outputs/e6_premovement_comparison.pdf", bbox_inches="tight")
+
+############
+# Exercise 7
+############
+
+X_distorted = X.copy()
+t0 = np.flatnonzero(times == -150).item() # index of time bin corresponding to -150 ms
+
+rng = np.random.default_rng(42)
+
+n_neurons, n_conditions, n_times = X.shape
+
+# Select half of conditions for each neuron, distorting trajectories after t0 by reflecting across value at t0
+for neuron in range(n_neurons):
+    selected = rng.choice(
+        n_conditions,
+        size=n_conditions // 2,
+        replace=False
+    )
+
+    boundary_values = X_distorted[neuron, selected, t0:t0 + 1]
+
+    X_distorted[neuron, selected, t0:] = (
+        2 * boundary_values
+        - X_distorted[neuron, selected, t0:]
+    )
+
+# Normalize
+control_maxima = X_distorted.max(axis=(1, 2), keepdims=True)
+control_minima = X_distorted.min(axis=(1, 2), keepdims=True)
+X_control_normalized = (X_distorted - control_minima) / (control_maxima - control_minima + 5)
+
+# Mean centering
+control_condition_mean = X_control_normalized.mean(axis=1, keepdims=True)
+X_control_centered = X_control_normalized - control_condition_mean
+
+# Select interval
+X_control_movement = X_control_centered[:, :, movement_mask]
+# Arrange as columns
+X_control_matrix = X_control_movement.reshape(182, -1)
+
+# Compute cov matrix
+control_covariance = (X_control_matrix @ X_control_matrix.T) / X_control_matrix.shape[1]
+
+# Find eigenvals and eigenvecs
+control_eigenvals, control_eigenvecs = np.linalg.eigh(control_covariance)
+control_order = np.argsort(control_eigenvals)[::-1]
+
+# Get 12 dirs with largest variance
+control_V_M = control_eigenvecs[:, control_order[:12]]
+
+# Project
+control_Z = control_V_M.T @ X_control_matrix
+control_Z_trajectories = control_Z.reshape(12, 108, 46)
+
+# Find fastest rotation plane
+A_control = estimate_A(control_Z_trajectories)
+control_rotation_values, control_rotation_vectors = np.linalg.eig(A_control)
+control_fastest_index = np.argmax(control_rotation_values.imag)
+control_fastest_vector = control_rotation_vectors[:, control_fastest_index]
+
+# Make projection axes
+control_real_axis = (control_fastest_vector.real / np.linalg.norm(control_fastest_vector.real))
+control_imag_axis = (control_fastest_vector.imag / np.linalg.norm(control_fastest_vector.imag))
+P_control_FR = np.vstack((control_real_axis, control_imag_axis))
+
+# Project PC coords
+control_FR_coords = P_control_FR @ control_Z
+control_FR_trajectories = control_FR_coords.reshape(2, 108, 46)
+control_FR_plot = control_FR_trajectories[:, :, FR_plot_mask]
+
+# Plot and save
+fig = plot_pc_trajectories(
+    control_FR_plot,
+    title="Control: Fastest-rotation plane (distorted data)",
+    xlabel="Control FR axis 1",
+    ylabel="Control FR axis 2"
+)
+fig.savefig("outputs/e7_control_rotation.pdf", bbox_inches="tight")
+
 plt.show()
