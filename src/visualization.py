@@ -60,6 +60,7 @@ def plot_pc_trajectories(Z_trajectories):
     ax.set_title("Principal Component Trajectories")
     ax.set_xlabel("PC1 Score")
     ax.set_ylabel("PC2 Score")
+    ax.set_aspect("equal", adjustable="box")
     fig.tight_layout()
 
     return fig
